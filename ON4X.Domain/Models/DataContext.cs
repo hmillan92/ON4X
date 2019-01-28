@@ -7,5 +7,7 @@
         public DataContext() : base("DefaultConnection")
         {
         }
+
+        public System.Data.Entity.DbSet<ON4X.Common.Models.Product> Products { get; set; }
     }
 }
