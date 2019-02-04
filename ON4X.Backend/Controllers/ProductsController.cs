@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using ON4X.Backend.Models;
-using ON4X.Common.Models;
+﻿namespace ON4X.Backend.Controllers
+{ 
+    using System.Data.Entity;
+    using System.Net;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Web.Mvc;
+    using ON4X.Common.Models;
+    using ON4X.Backend.Models;
 
-namespace ON4X.Backend.Controllers
-{
     public class ProductsController : Controller
     {
-        private LocalDataContext db = new LocalDataContext();
+        private LocalDataContext db = new LocalDataContext(); 
 
         // GET: Products
         public async Task<ActionResult> Index()
         {
-            return View(await db.Products.ToListAsync());
+            return View(await this.db.Products.OrderBy(p => p.Description).ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -29,7 +25,7 @@ namespace ON4X.Backend.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = await db.Products.FindAsync(id);
+            Product product = await this.db.Products.FindAsync(id);
             if (product == null)
             {
                 return HttpNotFound();
@@ -37,37 +33,35 @@ namespace ON4X.Backend.Controllers
             return View(product);
         }
 
-        // GET: Products/Create
+
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "ProductId,Description,Price,IsAvailable,PublishOn")] Product product)
+        public async Task<ActionResult> Create(Product product)
         {
             if (ModelState.IsValid)
             {
-                db.Products.Add(product);
-                await db.SaveChangesAsync();
+                this.db.Products.Add(product);
+                await this.db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
             return View(product);
         }
 
-        // GET: Products/Edit/5
+
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = await db.Products.FindAsync(id);
+            var product = await this.db.Products.FindAsync(id);
             if (product == null)
             {
                 return HttpNotFound();
@@ -75,45 +69,46 @@ namespace ON4X.Backend.Controllers
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "ProductId,Description,Price,IsAvailable,PublishOn")] Product product)
+        public async Task<ActionResult> Edit(Product product)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(product).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                this.db.Entry(product).State = EntityState.Modified;
+                await this.db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             return View(product);
         }
 
-        // GET: Products/Delete/5
+
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = await db.Products.FindAsync(id);
+
+            var product = await this.db.Products.FindAsync(id);
+
             if (product == null)
             {
                 return HttpNotFound();
             }
+
             return View(product);
         }
 
-        // POST: Products/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Product product = await db.Products.FindAsync(id);
-            db.Products.Remove(product);
-            await db.SaveChangesAsync();
+            var product = await this.db.Products.FindAsync(id);
+            this.db.Products.Remove(product);
+            await this.db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -121,7 +116,7 @@ namespace ON4X.Backend.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                this.db.Dispose();
             }
             base.Dispose(disposing);
         }
